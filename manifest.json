@@ -1,0 +1,9 @@
+{
+  "name": "サウナマスター",
+  "short_name": "サウナ",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#120d0a",
+  "theme_color": "#1b1410",
+  "icons": []
+}

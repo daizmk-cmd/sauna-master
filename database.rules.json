@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "saunas": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
