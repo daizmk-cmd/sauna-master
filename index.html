@@ -93,6 +93,8 @@
   .stars.empty-stars { color: var(--border); }
   .card-memo { font-size: 12px; color: var(--text-dim); margin-top: 6px; line-height: 1.5;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-link { display: inline-block; font-size: 12px; color: var(--accent); margin-top: 8px; text-decoration: none; }
+  .card-link:active { opacity: .7; }
 
   .fab {
     position: fixed; right: 20px; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
@@ -191,6 +193,10 @@
     <div class="field">
       <label>エリア</label>
       <input type="text" id="f-area" placeholder="例: 千代田区(神田)">
+    </div>
+    <div class="field">
+      <label>公式サイトURL</label>
+      <input type="text" id="f-url" placeholder="https://...">
     </div>
     <div class="field">
       <label>訪問状況</label>
@@ -299,7 +305,10 @@ function render() {
         <div class="card-area">${s.visitDate ? s.visitDate : ''}</div>
       </div>
       ${s.memo ? `<div class="card-memo">${escapeHtml(s.memo)}</div>` : ''}
+      ${safeUrl(s.url) ? `<a class="card-link" href="${escapeHtml(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">🔗 公式サイト</a>` : ''}
     `;
+    const link = card.querySelector('.card-link');
+    if (link) link.addEventListener('click', e => e.stopPropagation());
     card.addEventListener('click', () => openSheet(s));
     listEl.appendChild(card);
   }
@@ -309,6 +318,16 @@ function starString(rating) {
   const full = '★'.repeat(rating);
   const empty = '☆'.repeat(5 - rating);
   return full + empty;
+}
+
+function safeUrl(url) {
+  if (!url) return '';
+  try {
+    const u = new URL(url);
+    return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : '';
+  } catch {
+    return '';
+  }
 }
 
 function escapeHtml(str) {
@@ -346,6 +365,7 @@ function openSheet(sauna) {
   sheetTitle.textContent = sauna ? 'サウナを編集' : 'サウナを追加';
   document.getElementById('f-name').value = sauna ? sauna.name || '' : '';
   document.getElementById('f-area').value = sauna ? sauna.area || '' : '';
+  document.getElementById('f-url').value = sauna ? sauna.url || '' : '';
   document.getElementById('f-date').value = sauna ? sauna.visitDate || '' : '';
   document.getElementById('f-memo').value = sauna ? sauna.memo || '' : '';
   editingRating = sauna ? (sauna.rating || 0) : 0;
@@ -393,6 +413,7 @@ document.getElementById('btn-save').addEventListener('click', () => {
   const data = {
     name,
     area: document.getElementById('f-area').value.trim(),
+    url: document.getElementById('f-url').value.trim(),
     visited: editingVisited,
     rating: editingRating,
     visitDate: document.getElementById('f-date').value,
